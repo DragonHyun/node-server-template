@@ -1,4 +1,5 @@
 const { UserService } = require('../Services');
+const { logger } = require('../config/winston');
 
 const userController = {
     allUser: async (req, res, next) => {
@@ -54,6 +55,7 @@ const userController = {
                 isSuccess: false,
                 message: err
             })
+            next(err);
         }
     },
 

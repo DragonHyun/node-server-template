@@ -2,7 +2,9 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const morgan = require('morgan');
+const moment = require('moment');
+const { logger, stream } = require('./config/winston');
 
 const routes = require('./Routes');
 
@@ -15,35 +17,45 @@ sequelize.sync({ force: false })
         console.log('db connect success');
     })
     .catch((err) => {
-        console.error(err);
+        //console.error(err);
     });
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
-app.use(logger('dev'));
+app.use(morgan('dev', { stream }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(routes);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    //res.locals.message = err.message;
+    //res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    const errObj = {
+        req: {
+            headers: req.headers,
+            query: req.query,
+            body: req.body,
+            route: req.route
+        },
+        error: {
+            message: err.message,
+            stack: err.stack,
+            status: err.status
+        }
+    }
+
+    logger.error(errObj);
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
