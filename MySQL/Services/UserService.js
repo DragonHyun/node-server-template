@@ -1,15 +1,15 @@
-const { User } = require('../models');
+const { User } = require('../Models');
 
 const userService = {
     allUser: async () => {
         try {
             const allUser = await User.findAll();
-        
+
             return allUser;
         } catch (exception) {
             throw exception;
         }
-    }, 
+    },
 
     userInfo: async (userId) => {
         try {
@@ -27,7 +27,7 @@ const userService = {
     },
 
     createUser: async (name, age, married, comment) => {
-        try { 
+        try {
             await User.create({
                 name: name,
                 age: age,

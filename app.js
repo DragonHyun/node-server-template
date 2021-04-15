@@ -5,10 +5,12 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const moment = require('moment');
 const { logger, stream } = require('./config/winston');
+const mongoose = require('mongoose');
+const mongoUrl = require('./config/mongodb.json').mongodbUrl;
 
 const routes = require('./Routes');
 
-const { sequelize } = require('./models');
+const { sequelize } = require('./MySQL/Models');
 
 const app = express();
 
@@ -19,6 +21,13 @@ sequelize.sync({ force: false })
     .catch((err) => {
         //console.error(err);
     });
+
+mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+}).then(() => console.log('MongoDB connected'))
+    .catch((err) => console.error(err));
 
 app.use(morgan('dev', { stream }));
 app.use(express.json());

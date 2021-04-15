@@ -1,4 +1,4 @@
-const { UserService } = require('../Services');
+const { UserService } = require('../MySQL/Services');
 const { logger } = require('../config/winston');
 
 const userController = {
